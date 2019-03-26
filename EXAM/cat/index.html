@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    .cat{
+        width: 100%;
+        height: 500px; 
+        background-color: #ebc3b6; 
+    }
+    .maoshenti{
+        position: absolute;
+        width: 118px;
+        height: 202px;
+        top: 235px;
+        left: 106px;
+        background-size: 100%;
+        background-image: url(maoshenti.png);
+        z-index: 1;
+    }
+    .maowei{
+        position: relative;
+        width: 64px;
+        height: 194px;
+        top: 62px;
+        left: 97px;
+        background-image: url(maowei.png);
+        transform-origin: bottom center;
+        animation: ani_wei 8s ease infinite;  
+    }
+    @keyframes ani_wei{
+        0%{
+        transform: rotateZ(0);
+        }
+        25%{
+        transform: rotateZ(8deg);
+        }
+        50%{
+        transform: rotateZ(0);
+        }
+        75%{
+        transform: rotateZ(8deg);    
+        }
+        100%{
+        transform: rotateZ(0);
+        }
+    }
+    .maozhua{
+        position: relative;
+        left: 175px;
+        bottom: -220px;
+        width: 34px;
+        height: 81px;
+        background-image: url(maozhua.png);
+        transform-origin: top center;
+        animation: ani_zhua 8s ease infinite;  
+    }
+    @keyframes ani_zhua{
+        0%{
+        transform: rotateZ(0);
+        }
+        25%{
+        transform: rotateZ(-8deg);
+        }
+        50%{
+        transform: rotateZ(0);
+        }
+        75%{
+        transform: rotateZ(-8deg);    
+        }
+        100%{
+        transform: rotateZ(0);
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="cat">
+        <div class="maoshenti"></div>
+        <div class="maowei"></div>
+        <div class="maozhua"></div>
+    </div>
+</body>
+</html>
