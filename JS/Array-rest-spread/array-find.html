@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>array find</title>
+    
+</head>
+<body>
+    <script>
+    const ages = [
+        {
+            name: 'Lilei',age: 30
+        },
+        {
+            name: 'Lilei2',age: 36
+        },
+        {
+            name: 'Hanmeimei',age: 18
+        },
+        {
+            name: 'Hanmeimei2',age: 30
+        }
+    ]
+
+    const this_age = ages.find((age) => age.age > 18);
+
+    const this_age_filter = ages.filter((age) => age.age > 20);   
+
+    const this_age_index = ages.findIndex((age) => age.age > 20);
+
+    const this_age_every = ages.every((age) => age.age > 18);
+
+    const this_age_some = ages.some(age => age.age > 18);
+
+    // console.log(this_age,this_age_filter,this_age_index)
+    console.log(this_age_every)
+    console.log(this_age_some)
+
+    // const ages = [
+    //     18,20,30,40
+    // ];
+    
+    // const this_age = ages.find((age) => age === 20);  // 20
+
+    // const this_age_filter = ages.filter((age) => age > 20);
+    
+    // const this_age_index = ages.findIndex((age) => age === 20);  // 1
+
+    // console.log(this_age,this_age_filter,this_age_index)
+    </script> 
+</body>
+</html>
