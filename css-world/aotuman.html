@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    .box{
+        width: 0;
+    }
+    .box::before{
+        /* outline （轮廓）是绘制于元素周围的一条线，位于边框边缘的外围，可起到突出元素的作用。 */
+        /* 设置父容器的width为0， 数字或者中文则换行，outline就会沿着元素做一条线 */
+        /* 可不用SVG做一些简单的图形 */
+        content: 'love 萱 love';    
+        outline: 2px solid red;
+        color:#fff;
+
+    }
+    </style>
+</head>
+<body>
+    <div class="box">
+
+    </div>
+</body>
+</html>
