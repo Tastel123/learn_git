@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    // function Person(name,age){
+    //     this.name = name;
+    //     this.age = age;
+    //     this.sayName = new Function("console.log(this.name)");
+    // }
+
+    function Person(name,age){
+        this.name = name;
+        this.age = age;
+        this.sayName = sayName;
+    }
+    function sayName() {
+        console.log(this.name);
+    }
+    var person1 = new Person("wzx", 20);
+    var person2 = new Person("jwc", 20);
+
+    // 将sayName()的定义转移到构造函数外部
+    // 1.全局变量增多，造成全局变量污染；2.代码结构混乱，不易维护
+    </script>
+</body>
+</html>
