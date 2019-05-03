@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    var person = {};
+    // Object.defineProperty(person,"name",{
+    //     writable: false,
+    //     value: "wzx"
+    // });
+    // console.log(person.name);
+    // person.name = "jwc";
+    // console.log(person.name);
+
+
+    Object.defineProperty(person,"name",{
+        configurable: false,
+        value: "wzx"
+    });
+    // 把configurable 设置为false，表示不能从对象中删除属性
+    // 对这个属性调用delete，在严格模式下会导致错误
+    console.log(person.name);
+    delete person.name;
+    console.log(person.name);
+
+
+    // Object.defineProperty(person,"name",{
+    //     configurable: false,
+    //     value: "wzx"
+    // });
+    // Object.defineProperty(person,"name",{
+    //     configurable: true,
+    //     value: "wzx"
+    // });
+
+    </script>
+</body>
+</html>
