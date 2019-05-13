@@ -6,11 +6,11 @@ Component({
   properties: {
     lastMonth: {
       type: String,
-      value: '◀'
+      value: '<'
     },
     nextMonth: {
       type: String,
-      value: '▶'
+      value: '>'
     },
     weekText: {
       type: Array,
@@ -28,7 +28,7 @@ Component({
     title: '',
     // 上个月的格子
     emptyGridsBefore: [],
-    // 下个月的格子
+    // 下个月格子
     emptyGridsAfter: [],
     // 这个月的格子
     thisMonthDays: [],
@@ -67,8 +67,10 @@ Component({
 
       // 初始化日历组件
       this.display(year, month, date)
+
+      //发送事件监听
+      this.triggerEvent('select', select)
     },
-    
     zero(i) {
       return i >= 10 ? i : '0' + i;
     },
@@ -103,7 +105,7 @@ Component({
     },
     select(e) {
       let date = e.currentTarget.dataset.date,
-      select = this.data.year + '-' + this.zero(this.data.month) + '-' + this.zero(date)
+          select = this.data.year + '-' + this.zero(this.data.month) + '-' + this.zero(date)
       this.setData({
         title: this.data.year + '年' + this.zero(this.data.month) + '月' + this.zero(date) + '日',
         select: select,
@@ -111,37 +113,40 @@ Component({
         month: this.data.month,
         date: date
       })
-      // 发送事件监听
+      //发送事件监听
       this.triggerEvent('select', select)
     },
     lastMonth() {
       let month = this.data.month == 1 ? 12 : this.data.month - 1;
-      let year = this.data.month == 1 ? this.data.year - 1:this.data.year;
+      let year = this.data.month == 1 ? this.data.year - 1 : this.data.year;
       this.display(year, month, 0)
     },
     nextMonth() {
       let month = this.data.month == 12 ? 1 : this.data.month + 1;
-      let year = this.data.month == 12 ? this.data.year + 1:this.data.year;
+      let year = this.data.month == 12 ? this.data.year + 1 : this.data.year;
       this.display(year, month, 0)
     },
     // 获取当月空出的天数
-    createEmptyGrids(year,month) {
-      let week = new Date(Date.UTC(year, month - 1, 1)).getDay()
-        emptyGridsBefore = [],
-        emptyGridsAfter =[],
-        emptyDays = (week == 0 ? 7: week)
+    createEmptyGrids(year, month) {
+      let week = new Date(Date.UTC(year, month - 1, 1)).getDay(),
+          emptyGridsBefore = [],
+          emptyGridsAfter = [],
+          emptyDays = (week == 0 ? 7 : week)
       // 当月天数
-      let thisMonthDays = this.getThisMonthDays(year,month)
+      let thisMonthDays = this.getThisMonthDays(year, month)
       // 上月天数
-      let preMonthDays = month - 1 < 0 ? this.getThisMonthDays(year - 1, 12) : this.getThisMonthDays(year, month - 1)
+      let preMonthDays = month - 1 < 0 ? 
+      this.getThisMonthDays(year - 1, 12) :
+      this.getThisMonthDays(year, month - 1);
+
       // 空出的日期
       for (let i = 1; i <= emptyDays; i++) {
         emptyGridsBefore.push(preMonthDays - (emptyDays - i))
-      }    
+      }
 
       let after = (42 - thisMonthDays - emptyDays) - 7 >= 0 
-        ? (42 - thisMonthDays - emptyDays) -7 
-        : (42 - thisMonthDays - emptyDays)
+                  ? (42 - thisMonthDays - emptyDays) - 7
+                  : (42 - thisMonthDays - emptyDays)
 
       for (let i = 1; i <= after; i++) {
         emptyGridsAfter.push(i)
@@ -150,7 +155,6 @@ Component({
         emptyGridsAfter,
         emptyGridsBefore
       })
-
     }
   }
 })
