@@ -7,20 +7,30 @@
     <title>Document</title>
 </head>
 <body>
-    <script src="./promise.js"></script>
     <script>
-    var a = 0
-    new myPromise((resolve,reject) => {
-        setTimeout(() => {
-            a = 1;
-            resolve('ok')
-        },1000)  
-    }).then((e) => {
-        console.log(e)
-        console.log(a)
+    function getData(names) {
+        // 伪代码
+        // 1. 名字数组 变成拼接url数组
+        const promises = names.map(name => fetch(`https://api.github.com/users/${name}`))
+        const people = Promise.all(promises)
+        return people;
+        // 2. fetch 异步的,
+        // 3. Promise.all 
+        // 4. 返回 结果
+        
+    }
+    const people = getData(['moonnight5', 'chenshiai', 'llinniee']); 
+    console.log(people);
+    people.then(data => {
+        // console.log(data)
+        return Promise.all(
+            data.map(
+                item => item.json()
+            )
+        )
+    }).then(data => {
+        console.log(data);
     })
-    
     </script>
-    
 </body>
 </html>
