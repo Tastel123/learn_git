@@ -5,32 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+    .news>div{
+        text-align: center;
+        height: 50px;
+    }
+    </style>
 </head>
 <body>
+    <div class="news"></div>
     <script>
-    function getData(names) {
-        // 伪代码
-        // 1. 名字数组 变成拼接url数组
-        const promises = names.map(name => fetch(`https://api.github.com/users/${name}`))
-        const people = Promise.all(promises)
-        return people;
-        // 2. fetch 异步的,
-        // 3. Promise.all 
-        // 4. 返回 结果
-        
+    // 只要有length属性的类数组，变成数组
+    const originNews = Array.from({
+        length: 10000
+    }, (v, k) => ({content: `新闻${k}`}));
+    const container = document.querySelector('.news');
+    console.log(originNews);
+    let ele = document.createElement('div');
+    for (let item of originNews) {
+        let otherEle = ele.cloneNode(true);
+        otherEle.innerHTML = item.content;
+        container.appendChild(otherEle);
     }
-    const people = getData(['moonnight5', 'chenshiai', 'llinniee']); 
-    console.log(people);
-    people.then(data => {
-        // console.log(data)
-        return Promise.all(
-            data.map(
-                item => item.json()
-            )
-        )
-    }).then(data => {
-        console.log(data);
-    })
     </script>
 </body>
 </html>
