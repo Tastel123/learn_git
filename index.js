@@ -1,87 +1,54 @@
-// 会溢出
-// 用的是字符串，链表
-function LinkedNode(val) {
-    this.val = val;
-    this.next = null;
-}
-/**
- * 
- * @param {LinkedList} l1 
- * @param {LinkedList} l2 
- */
-var addTwoNumbers = function(l1,l2) {
-    let a = [],
-        b = [],
-        newL1 = l1,  
-        newL2 = l2 // 将参数变为局部变量   引用赋值
-    // 倒着来 链表是单向的，是做不到的
-    // array reverse();
-    while(newL1) {
-        a.push(newL1.val);
-        newL1 = newL1.next;
-    }
-
-    while(newL2) {
-        b.push(newL2.val);
-        newL2 = newL2.next;
-    }
-
-    a.reverse();
-    b.reverse();
-    console.log(a,b);
-
-    let ans = []; // 两位相加的结果
-    let carry = 0; // 是否进位
-    while(a.length || b.length) {
-        let c = a.length ? a.shift() : 0;
-        let d = b.length ? b.shift() : 0;
-        
-        let sum = c + d + carry;
-        ans.push(sum % 10);  // 对10求余
-        if (sum >= 10) {
-            carry = 1;
-        } else {
-            carry = 0;
+const path = require('path');
+const Koa = require('koa');  // node开发框架
+// 静态资源 动态资源（数据库）
+const server = require('koa-static');
+const route = require('koa-route');
+const axios = require('axios');
+const main = server(path.join(__dirname, '/public'));  // 将静态资源变为服务器
+const clientID = '1c104ee67c9282cc229c';
+const clientSecret = 'c948519557c7c8e20a0aea1ab10f507d626ea23d';
+// 从前端思维切到后端思维
+const oauth = async ctx => {
+    // 可以await 数据库
+    // await 请求
+    // console.log(ctx.request,ctx.request.query.code,'--------------')
+    // const str = await new Promise((resolve,reject) => {
+    //     setTimeout(() => {
+    //         resolve('等了三秒钟')
+    //     },3000)
+    //    });
+    //    console.log(str);
+    // code => token
+    const requestToken = ctx.request.query.code;
+    const token_url = 'https://github.com/login/oauth/access_token?' +
+        `client_id=${clientID}&` +
+        `client_secret=${clientSecret}&` +
+        `code=${requestToken}`;
+        console.log(token_url);
+    const tokenResponse = await axios({
+        method: 'post',
+        url: token_url,
+        headers: {
+            accept: 'application/json'
         }
-
-    }
-
-    carry && (ans.push(carry)); // 最后如果有进位
-    ans.reverse();  // 反过来
-
-    // 返回的应该也是一个节点，头结点
-    let ret = [];
-    for (let i = 0, len = ans.length; i < len; i++){
-        ret[i] = new LinkedNode(ans[i]);  // 值部分
-    }
-    for (let i = 0, len = ans.length; i < len - 1; i++){
-        ret[i].next = ret[i + 1];  // 指针
-    }
-    return ret[0];
-    // return ans.join('');
+    });
+    const accessToken = tokenResponse.data.access_token;
+    console.log(accessToken);
+    const result = await axios({
+        method: 'get',
+        url: 'https://api.github.com/user',
+        headers: {
+            accept: 'application/json',
+            Authorization: `token ${accessToken}`
+        }
+    });
+    const avatar_url = result.data.avatar_url;
+    ctx.response.redirect(`/welcome.html?avatar_url=${avatar_url}`);
+    // ctx.response.redirect('/welcome.html')
 }
-
-// 链表的初始化
-let a1 = new LinkedNode(1);
-    a2 = new LinkedNode(2);
-    a3 = new LinkedNode(3);
-a1.next = a2;
-a2.next = a3;
-
-let b1 = new LinkedNode(4);
-    b2 = new LinkedNode(5);
-    b3 = new LinkedNode(6);
-b1.next = b2;
-b2.next = b3;
-
-let ret = addTwoNumbers(a1, b1);
-while(ret) {
-    console.log(ret.val);
-    ret = ret.next;
-}
-
-// let node = a1;
-// while(node) {
-//     console.log(node.val);
-//     node = node.next;
-// }
+// public 让用户可以访问到
+// 路由 网站是提供资源的
+const app = new Koa();  // 后端应用
+app.use(main);
+app.use(route.get('/oauth/redirect',oauth));   // oauth:中间件函数
+app.listen(8080);
