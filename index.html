@@ -4,51 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
     <title>Document</title>
 </head>
 <body>
-    <div id="lists"></div>
-    <!-- html entity -->
-    <!-- 空格 -->
-    &nbsp;
-    <!-- < -->
-    &lt;
-    <!-- > -->
-    &gt;
+    <div id="app">{{message}}
+        <p class="cool" v-bind:class="{good:isGood}" v-on:click="reverseMsg">{{msg}}</p>
+        <!-- <p class="cool" v-bind:class="isGood ? 'good':'bad'">LeeMinho</p> -->
+        <!-- <p class="cool" v-bind:class="[activeClass]">LeeMinho</p>
+        <ul>
+            <li v-for="todo in todos">{{todo.text}}</li>
+        </ul> -->
+        <!-- <p>{{content}}</p>
+        <input type="text" v-model="content"> -->
+    </div>
     <script>
-        // 扩展字符串
-        // 扩展对象
-        Array.prototype.double = function() {
-            console.log(this);
-            // 谁调用 double, 谁就是 this
-            return this.map(ele => ele * 2)
-        }
-    let arr = [1, 2, 3];
-    let newArr = arr.double();
-    // 返回 原数组 扩大两倍
-    // 错误分析
-    const promise = new Promise((resolve,reject) => {
-        setTimeout(() => {
-            reject('err');
-        },1500)
-    })
-    promise.then(res => {
-        console.log(res);
-    })
-    .catch(err => {
-        // 上报
-        console.log(err);
-    })
-    try{
-        const lists = document.getElementById('list')
-        // lists === null
-        lists.style.width = '10px';
-    } catch(error) {
-        console.log(error);
-    }
-
-    console.log('正确的代码');
+        var app = new Vue({
+            el: '#app',
+            data: {
+                message: 'hello',
+                isGood: false,
+                activeClass: 'active',
+                todos: [
+                    {text: '学习vue'},
+                    {text: '学习js'},
+                    {text: '学习学习'},
+                ],
+                content: '',
+                msg: '儿童画'
+            },
+            methods: {
+                reverseMsg() {
+                    this.msg = this.msg.split('').reverse().join('')
+                }
+            }
+        })
     </script>
-
 </body>
 </html>
