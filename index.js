@@ -1,60 +1,87 @@
-// 位移运算 (右移)
-// 二进制位  0000 1011
-// 0000 0101
-// 0001 0110
-// 利用位移运算，/2 *2的效果
-// console.log(11 >> 1);  // 右移运算符
-// console.log(11 << 1);
-
-// 猛哥给蜗牛买香蕉
-// N piles of bananas   每挂香蕉上的香蕉数不一样
-// [3,6,7,11], H 小时内吃完  一小时应该吃几根香蕉  
-// 一小时内吃mid根香蕉， 一次只能吃一把，一小时最少吃几根，可以在H小时内吃完
-
+// 会溢出
+// 用的是字符串，链表
+function LinkedNode(val) {
+    this.val = val;
+    this.next = null;
+}
 /**
- * @desc 最少吃香蕉的速度,在规定时间内吃完
- * @param {number[]} piles 
- * @param {number} H
- * @return {number} 
+ * 
+ * @param {LinkedList} l1 
+ * @param {LinkedList} l2 
  */
+var addTwoNumbers = function(l1,l2) {
+    let a = [],
+        b = [],
+        newL1 = l1,  
+        newL2 = l2 // 将参数变为局部变量   引用赋值
+    // 倒着来 链表是单向的，是做不到的
+    // array reverse();
+    while(newL1) {
+        a.push(newL1.val);
+        newL1 = newL1.next;
+    }
 
-function minEatingSpeed (piles, H){
-    let lo = 1;
-        hi = Math.max(...piles);
-    // 二分查找，一直丢一半，
-    while(lo <= hi) {
-        // lo ++;
-        let mid = lo + ((hi-lo) >> 1);
-        if (canEatAllBananas(piles, H, mid)){
-            hi = mid - 1;
+    while(newL2) {
+        b.push(newL2.val);
+        newL2 = newL2.next;
+    }
+
+    a.reverse();
+    b.reverse();
+    console.log(a,b);
+
+    let ans = []; // 两位相加的结果
+    let carry = 0; // 是否进位
+    while(a.length || b.length) {
+        let c = a.length ? a.shift() : 0;
+        let d = b.length ? b.shift() : 0;
+        
+        let sum = c + d + carry;
+        ans.push(sum % 10);  // 对10求余
+        if (sum >= 10) {
+            carry = 1;
         } else {
-            // 没有吃完 吃完？
-            // 小的一半值没有意义
-            lo = mid + 1;
+            carry = 0;
         }
+
     }
-    return lo;
+
+    carry && (ans.push(carry)); // 最后如果有进位
+    ans.reverse();  // 反过来
+
+    // 返回的应该也是一个节点，头结点
+    let ret = [];
+    for (let i = 0, len = ans.length; i < len; i++){
+        ret[i] = new LinkedNode(ans[i]);  // 值部分
+    }
+    for (let i = 0, len = ans.length; i < len - 1; i++){
+        ret[i].next = ret[i + 1];  // 指针
+    }
+    return ret[0];
+    // return ans.join('');
 }
 
-/**
- * @desc 判断能否吃完香蕉
- * @param {number[]} piles 
- * @param {number} H 
- * @param {number} mid
- * @return {boolean} 
- */
-function canEatAllBananas(piles, H, mid) {
-    let h = 0;
-    // mid, 余下吃完
-    for (let pile of piles) {
-        h += Math.ceil(pile / mid);  // 向上取整
-    }
-    return h <= H;
+// 链表的初始化
+let a1 = new LinkedNode(1);
+    a2 = new LinkedNode(2);
+    a3 = new LinkedNode(3);
+a1.next = a2;
+a2.next = a3;
+
+let b1 = new LinkedNode(4);
+    b2 = new LinkedNode(5);
+    b3 = new LinkedNode(6);
+b1.next = b2;
+b2.next = b3;
+
+let ret = addTwoNumbers(a1, b1);
+while(ret) {
+    console.log(ret.val);
+    ret = ret.next;
 }
 
-let piles = [3,6,7,11];
-// console.log(canEatAllBananas(piles, 8, 5))
-console.log(minEatingSpeed([3,6,7,11],8));
-// - 吃完香蕉目标？
-// H 小时内吃完
-// - 最小的一个数
+// let node = a1;
+// while(node) {
+//     console.log(node.val);
+//     node = node.next;
+// }
