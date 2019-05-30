@@ -1,87 +1,114 @@
-// 会溢出
-// 用的是字符串，链表
-function LinkedNode(val) {
-    this.val = val;
-    this.next = null;
+const superagent = require('superagent');
+const cheerio = require('cheerio');
+const ejs = require('ejs');
+const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
+
+const local = 'jiangxi/qingshanhu-district';
+const weatherUrl = `https://tianqi.moji.com/weather/china/${local}`;
+const getWeatherTips = function () {
+    return new Promise((resolve, reject) => {
+        superagent.get(weatherUrl)
+            .end((err, res) => {
+                if (err) {
+                    reject(err)
+                }
+                const $ = cheerio.load(res.text);
+                const $weatherTip = $('.wea_tips');
+                // find() 查找XX元素下面的节点
+                const weatherTip = $weatherTip
+                    .find('em').text();
+                let threeDaysData = [];
+                $('.forecast .days')
+                    .each((index, dayNode) => {
+                        const $singleDay = $(dayNode).find('li');
+                        const day = $singleDay.eq(0).text().trim();
+                        const weatherText = $singleDay.eq(1).text().trim();
+                        const temperature = $singleDay.eq(2).text().trim();
+                        threeDaysData.push({
+                            day, weatherText, temperature
+                        })
+                    })
+                resolve({ weatherTip, threeDaysData });
+            })
+    })
 }
-/**
- * 
- * @param {LinkedList} l1 
- * @param {LinkedList} l2 
- */
-var addTwoNumbers = function(l1,l2) {
-    let a = [],
-        b = [],
-        newL1 = l1,  
-        newL2 = l2 // 将参数变为局部变量   引用赋值
-    // 倒着来 链表是单向的，是做不到的
-    // array reverse();
-    while(newL1) {
-        a.push(newL1.val);
-        newL1 = newL1.next;
-    }
+const getOneData = function () {
+    return new Promise((resolve, reject) => {
+        superagent.get('http://wufazhuce.com/')
+            .end((err, res) => {
+                if (err) {
+                    reject(err);
+                }
+                let $ = cheerio.load(res.text);
+                let selectItem = $("#carousel-one .carousel-inner .item");
+                let todayOne = selectItem[0];
+                let todayOneData = {
+                    type: $(todayOne)
+                        .find(".fp-one-imagen-footer")
+                        .text()
+                        .replace(/\s/g, ''),
+                    text: $(todayOne)
+                        .find(".fp-one-cita")
+                        .text()
+                        .replace(/\s/g, '')
+                };
+                resolve(todayOneData)
 
-    while(newL2) {
-        b.push(newL2.val);
-        newL2 = newL2.next;
-    }
-
-    a.reverse();
-    b.reverse();
-    console.log(a,b);
-
-    let ans = []; // 两位相加的结果
-    let carry = 0; // 是否进位
-    while(a.length || b.length) {
-        let c = a.length ? a.shift() : 0;
-        let d = b.length ? b.shift() : 0;
-        
-        let sum = c + d + carry;
-        ans.push(sum % 10);  // 对10求余
-        if (sum >= 10) {
-            carry = 1;
-        } else {
-            carry = 0;
+            })
+    })
+}
+// Promise.all()
+// getWeatherTips()
+//     .then(tip => {
+//         console.log(tip);
+//     })
+// 聚合数据
+function getSpiderData() {
+    let htmlData = {};
+    Promise.all([getWeatherTips(), getOneData()])
+    .then(spiderArr => {
+        // spiderArr 数组由 promise resolve 出来的数组组成
+        const [weatherData, oneData] = spiderArr;
+        htmlData['weatherTip'] = weatherData.weatherTip;
+        console.log(1, htmlData);
+        sendEmail(htmlData);
+    })
+}
+function sendEmail(htmlData) {
+    console.log(2, htmlData);
+    const template = ejs.compile(
+        fs.readFileSync(
+            path.resolve(__dirname, 'email.ejs'),
+            'utf8'
+        )
+    )
+    const html = template(htmlData);
+    // 发送邮件
+    let transporter = nodemailer.createTransport({
+        service: 'qq',
+        port: 465, // smtp端口号
+        secureConnection: true,
+        auth: {
+            user: '244674264@qq.com',
+            pass: 'kdfdmkjzdfrncbcj'
         }
-
-    }
-
-    carry && (ans.push(carry)); // 最后如果有进位
-    ans.reverse();  // 反过来
-
-    // 返回的应该也是一个节点，头结点
-    let ret = [];
-    for (let i = 0, len = ans.length; i < len; i++){
-        ret[i] = new LinkedNode(ans[i]);  // 值部分
-    }
-    for (let i = 0, len = ans.length; i < len - 1; i++){
-        ret[i].next = ret[i + 1];  // 指针
-    }
-    return ret[0];
-    // return ans.join('');
+    })
+    transporter.sendMail(
+        {
+            from: 'Tastel <244674264@qq.com>',
+            to: '244674264@qq.com',
+            subject: '邮件',
+            html: html
+        },
+        (err, info) => {
+            if (err) {
+                console.log('err', err);
+                return false;
+            }
+            console.log('info', info);
+        })
 }
+getSpiderData();
 
-// 链表的初始化
-let a1 = new LinkedNode(1);
-    a2 = new LinkedNode(2);
-    a3 = new LinkedNode(3);
-a1.next = a2;
-a2.next = a3;
-
-let b1 = new LinkedNode(4);
-    b2 = new LinkedNode(5);
-    b3 = new LinkedNode(6);
-b1.next = b2;
-b2.next = b3;
-
-let ret = addTwoNumbers(a1, b1);
-while(ret) {
-    console.log(ret.val);
-    ret = ret.next;
-}
-
-// let node = a1;
-// while(node) {
-//     console.log(node.val);
-//     node = node.next;
-// }
