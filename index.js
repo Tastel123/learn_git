@@ -1,114 +1,45 @@
-const superagent = require('superagent');
-const cheerio = require('cheerio');
-const ejs = require('ejs');
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
+const puppeteer = require('puppeteer');
+const sleep = (time) => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve(1);
+    }, time)
+})
+async function getLeetCode() {
+    const browser = await puppeteer.launch({
+      headless: false  
+    })
+    const page = await browser.newPage();
+    page.setViewport({
+        width: 1376,
+        height: 768
+    })
+    await page.goto('https://leetcode-cn.com/u/yan-bo-yi', {
+        waitUntil: 'networkidle0'
+    });
+    // 等待一秒
+    await sleep(3000);
+    const data = await page.evaluate(() => {
+        const rank = document
+        .querySelector('.css-1x529is-RankNumber')
+        console.log('这段字来自evaluate');
 
-const local = 'jiangxi/qingshanhu-district';
-const weatherUrl = `https://tianqi.moji.com/weather/china/${local}`;
-const getWeatherTips = function () {
-    return new Promise((resolve, reject) => {
-        superagent.get(weatherUrl)
-            .end((err, res) => {
-                if (err) {
-                    reject(err)
-                }
-                const $ = cheerio.load(res.text);
-                const $weatherTip = $('.wea_tips');
-                // find() 查找XX元素下面的节点
-                const weatherTip = $weatherTip
-                    .find('em').text();
-                let threeDaysData = [];
-                $('.forecast .days')
-                    .each((index, dayNode) => {
-                        const $singleDay = $(dayNode).find('li');
-                        const day = $singleDay.eq(0).text().trim();
-                        const weatherText = $singleDay.eq(1).text().trim();
-                        const temperature = $singleDay.eq(2).text().trim();
-                        threeDaysData.push({
-                            day, weatherText, temperature
-                        })
-                    })
-                resolve({ weatherTip, threeDaysData });
-            })
-    })
-}
-const getOneData = function () {
-    return new Promise((resolve, reject) => {
-        superagent.get('http://wufazhuce.com/')
-            .end((err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                let $ = cheerio.load(res.text);
-                let selectItem = $("#carousel-one .carousel-inner .item");
-                let todayOne = selectItem[0];
-                let todayOneData = {
-                    type: $(todayOne)
-                        .find(".fp-one-imagen-footer")
-                        .text()
-                        .replace(/\s/g, ''),
-                    text: $(todayOne)
-                        .find(".fp-one-cita")
-                        .text()
-                        .replace(/\s/g, '')
-                };
-                resolve(todayOneData)
-
-            })
-    })
-}
-// Promise.all()
-// getWeatherTips()
-//     .then(tip => {
-//         console.log(tip);
-//     })
-// 聚合数据
-function getSpiderData() {
-    let htmlData = {};
-    Promise.all([getWeatherTips(), getOneData()])
-    .then(spiderArr => {
-        // spiderArr 数组由 promise resolve 出来的数组组成
-        const [weatherData, oneData] = spiderArr;
-        htmlData['weatherTip'] = weatherData.weatherTip;
-        console.log(1, htmlData);
-        sendEmail(htmlData);
-    })
-}
-function sendEmail(htmlData) {
-    console.log(2, htmlData);
-    const template = ejs.compile(
-        fs.readFileSync(
-            path.resolve(__dirname, 'email.ejs'),
-            'utf8'
-        )
-    )
-    const html = template(htmlData);
-    // 发送邮件
-    let transporter = nodemailer.createTransport({
-        service: 'qq',
-        port: 465, // smtp端口号
-        secureConnection: true,
-        auth: {
-            user: '244674264@qq.com',
-            pass: 'kdfdmkjzdfrncbcj'
+        const submitHistory = document
+        .querySelectorAll('.css-i7v0bm-StackRow');
+        // 转为真正的数组
+        const submitHistoryArray = Array.from(submitHistory);
+        const submitHistoryList = submitHistoryArray
+        .map(submitNode => {
+            return submitNode.innerText;
+        })
+        return {
+            rank: rank.innerText,
+            submitHistoryList
         }
     })
-    transporter.sendMail(
-        {
-            from: 'Tastel <244674264@qq.com>',
-            to: '244674264@qq.com',
-            subject: '邮件',
-            html: html
-        },
-        (err, info) => {
-            if (err) {
-                console.log('err', err);
-                return false;
-            }
-            console.log('info', info);
-        })
+    console.log('rank data', data);
+    await page.screenshot({
+        path:'./yanboyi.png'
+    })
+    // browser.close();
 }
-getSpiderData();
-
+getLeetCode();
