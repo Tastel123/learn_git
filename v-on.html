@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <title>v-on</title>
+</head>
+
+<body>
+    <h1>v-on</h>
+    <hr>
+    <div id="app">
+        本场比赛得分, {{score}}
+        <p>
+            <button v-on:click="jiafen">加分</button>
+            <button @click="jianfen">减分</button><br/>
+            <input type="text" v-on:keyup.enter="onEnter" v-model="grade">
+        </p>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                score: 0,
+                grade: 1
+            },
+            methods: {
+                jiafen() {
+                    this.score++
+                },
+                jianfen() {
+                    this.score--
+                },
+                onEnter() {
+                    this.score = this.score + parseInt(this.grade)
+                }
+            }
+        }) 
+    </script>
+</body>
+
+</html>
