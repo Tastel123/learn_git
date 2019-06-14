@@ -1,45 +1,49 @@
-const puppeteer = require('puppeteer');
-const sleep = (time) => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(1);
-    }, time)
-})
-async function getLeetCode() {
-    const browser = await puppeteer.launch({
-      headless: false  
-    })
-    const page = await browser.newPage();
-    page.setViewport({
-        width: 1376,
-        height: 768
-    })
-    await page.goto('https://leetcode-cn.com/u/yan-bo-yi', {
-        waitUntil: 'networkidle0'
-    });
-    // 等待一秒
-    await sleep(3000);
-    const data = await page.evaluate(() => {
-        const rank = document
-        .querySelector('.css-1x529is-RankNumber')
-        console.log('这段字来自evaluate');
-
-        const submitHistory = document
-        .querySelectorAll('.css-i7v0bm-StackRow');
-        // 转为真正的数组
-        const submitHistoryArray = Array.from(submitHistory);
-        const submitHistoryList = submitHistoryArray
-        .map(submitNode => {
-            return submitNode.innerText;
-        })
-        return {
-            rank: rank.innerText,
-            submitHistoryList
-        }
-    })
-    console.log('rank data', data);
-    await page.screenshot({
-        path:'./yanboyi.png'
-    })
-    // browser.close();
+function ListNode (val) {
+    this.val = val;
+    this.next = null;
 }
-getLeetCode();
+
+function mergeTwoLists(l1, l2) {
+    // 链表转数组的算法
+    var ans = [];
+    while(l1) {
+        ans.push(new ListNode(l1.val));
+        l1 = l1.next;
+    }
+    while(l2) {
+        ans.push(new ListNode(l2.val));
+        l2 = l2.next;
+    }
+    // console.log(ans);
+    ans.sort(function(a,b) {      // 排序
+        return a.val - b.val;
+    })
+
+    if(!ans.length) 
+    return null;
+
+    for (var i = 0, len = ans.length; i < len-1; i++) {    // 让新的链表连接起来  i<len-1
+        ans[i].next = ans[i+1];
+    }   
+    // console.log(ans); 
+    return ans[0];
+    
+}
+
+var a1 = new ListNode(1);
+var a2 = new ListNode(2);
+a1.next = a2;
+var a3 = new ListNode(4);
+a2.next = a3;
+
+var b1 = new ListNode(1);
+var b2 = new ListNode(3);
+b1.next = b2;
+var b3 = new ListNode(4);
+b2.next = b3;
+
+var l3 = mergeTwoLists(a1, b1);
+while(l3) {
+    console.log(l3.val);
+    l3 = l3.next;
+}
